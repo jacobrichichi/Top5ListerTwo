@@ -104,6 +104,56 @@ class App extends React.Component {
             this.db.mutationUpdateSessionData(this.state.sessionData);
         });
     }
+
+    renameItem = (index, newName) => {
+        let newList = this.state.currentList;
+
+        newList.items[index] = newName;
+        this.setState(prevState => ({
+            currentList: newList,
+            sessionData: prevState.sessionData
+
+        }), () => {
+            let list = this.db.queryGetList(newList.key);
+            list.items[index] = newName;
+            this.db.mutationUpdateList(list);
+            this.db.mutationUpdateSessionData(this.state.sessionData);
+        })
+        
+    }
+
+    moveListItems = (source, target) => {
+        let list = this.state.currentList;
+        let items = list.items;
+        let sourceItem = items[source];
+
+        if(source>target){
+            for(let i = source-1; i>=target; i--){
+               items[i+1] = items[i];
+            }
+        }
+
+        else{
+            for(let i = source+1; i<=target; i++){
+                items[i-1] = items[i];
+            }
+        }
+        items[target] = sourceItem;
+        list.items = items;
+
+        this.setState(prevState => ({
+            currentList: list,
+            sessionData: prevState.sessionData
+
+        }), () => {
+            let newList = this.db.queryGetList(list.key);
+            newList.items = items;
+            this.db.mutationUpdateList(newList);
+            this.db.mutationUpdateSessionData(this.state.sessionData);
+        })
+
+    }
+
     // THIS FUNCTION BEGINS THE PROCESS OF LOADING A LIST FOR EDITING
     loadList = (key) => {
         let newCurrentList = this.db.queryGetList(key);
@@ -142,6 +192,8 @@ class App extends React.Component {
         let modal = document.getElementById("delete-modal");
         modal.classList.remove("is-visible");
     }
+
+
     render() {
         return (
             <div id="app-root">
@@ -158,7 +210,9 @@ class App extends React.Component {
                     renameListCallback={this.renameList}
                 />
                 <Workspace
-                    currentList={this.state.currentList} />
+                    currentList={this.state.currentList}
+                    renameItemCallback={this.renameItem}
+                    moveListItemsCallback = {this.moveListItems} />
                 <Statusbar 
                     currentList={this.state.currentList} />
                 <DeleteModal

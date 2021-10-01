@@ -9,6 +9,7 @@ export default class ListCard extends React.Component {
             editActive: false,
         }
     }
+    
     handleClick = (event) => {
         if (event.detail === 1) {
             this.handleLoadList(event);
@@ -17,8 +18,10 @@ export default class ListCard extends React.Component {
             this.handleToggleEdit(event);
         }
     }
+
     handleLoadList = (event) => {
         let listKey = event.target.id;
+        
         if (listKey.startsWith("list-card-text-")) {
             listKey = listKey.substring("list-card-text-".length);
         }
