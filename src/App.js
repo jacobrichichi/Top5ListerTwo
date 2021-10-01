@@ -225,7 +225,7 @@ class App extends React.Component {
         modal.classList.add("is-visible");
     }
     // THIS FUNCTION IS FOR HIDING THE MODAL
-    hideDeleteListModal() {
+    hideDeleteListModal = (event) => {
         this.setState(prevState => ({ 
             currentList: prevState.currentList,
             listKeyPairMarkedForDeletion: null,
@@ -259,6 +259,7 @@ class App extends React.Component {
                 <DeleteModal
                     hideDeleteListModalCallback={this.hideDeleteListModal}
                     confirmDeleteListCallback = {this.confirmedListDeletion}
+                    listKeyPair = {this.state.listKeyPairMarkedForDeletion}
                 />
             </div>
         );
