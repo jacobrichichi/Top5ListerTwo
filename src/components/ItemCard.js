@@ -36,7 +36,13 @@ export default class ItemCard extends React.Component {
     }
 
     handleBlur = () => {
-        this.props.renameItemCallback(this.props.index, this.state.text)
+        let text = '';
+        if(!this.state.text)
+            text = this.props.text;
+        else{
+            text = this.state.text;
+        }
+        this.props.renameItemCallback(this.props.index, text)
         this.handleToggleEdit();
     }
 
