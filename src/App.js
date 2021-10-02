@@ -31,7 +31,10 @@ class App extends React.Component {
             currentList : null,
             sessionData : loadedSessionData,
             listKeyPairMarkedForDeletion : null,
-            editing: false
+            editing: false,
+            undoEnabled: false,
+            redoEnabled: false,
+            closeListEnabled: false,
         }
     }
     sortKeyNamePairsByName = (keyNamePairs) => {
@@ -146,6 +149,7 @@ class App extends React.Component {
     addRenameItemTransaction = (index, oldName, newName) => {
         let transaction = new ChangeItem_Transaction(this, index, oldName, newName);
         this.tps.addTransaction(transaction);
+        this.updateEditToolbarVariables();
         
     }
 
@@ -168,6 +172,7 @@ class App extends React.Component {
     addMoveItemsTransaction = (source, target) => {
         let transaction = new MoveItem_Transaction(this, source, target);
         this.tps.addTransaction(transaction);
+        this.updateEditToolbarVariables();
     }
 
     moveListItems = (source, target) => {
@@ -209,7 +214,7 @@ class App extends React.Component {
             currentList: newCurrentList,
             sessionData: prevState.sessionData
         }), () => {
-            // ANY AFTER EFFECTS?
+            this.setState({closeListEnabled: true})
         });
     }
     // THIS FUNCTION BEGINS THE PROCESS OF CLOSING THE CURRENT LIST
@@ -219,7 +224,9 @@ class App extends React.Component {
             listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
             sessionData: this.state.sessionData
         }), () => {
-            // ANY AFTER EFFECTS?
+            this.setState({closeListEnabled: false});
+            this.tps.clearAllTransactions();
+            this.updateEditToolbarVariables();
         });
     }
     deleteList = (keyPair) => {
@@ -254,14 +261,14 @@ class App extends React.Component {
     undo = () => {
         if (this.tps.hasTransactionToUndo()) {
             this.tps.undoTransaction();
-            //update toolbar buttons
+            this.updateEditToolbarVariables();
         }
     }
 
     redo = () => {
         if (this.tps.hasTransactionToRedo()){
             this.tps.doTransaction();
-            //update toolbar buttons
+            this.updateEditToolbarVariables();
         }
     }
 
@@ -270,6 +277,14 @@ class App extends React.Component {
             editing: isEditing
         })
     }
+
+    updateEditToolbarVariables = () => {
+        this.setState({
+            undoEnabled: this.tps.hasTransactionToUndo(),
+            redoEnabled: this.tps.hasTransactionToRedo()});
+    }
+
+
 
     render() {
         document.addEventListener('keydown', (event) => {
@@ -290,7 +305,10 @@ class App extends React.Component {
                     title='Top 5 Lister'
                     closeCallback={this.closeCurrentList}
                     undoCallback = {this.undo}
-                    redoCallback = {this.redo} />
+                    redoCallback = {this.redo}
+                    undoEnabled = {this.state.undoEnabled}
+                    redoEnabled = {this.state.redoEnabled}
+                    closeListEnabled = {this.state.closeListEnabled} />
                 <Sidebar
                     heading='Your Lists'
                     currentList={this.state.currentList}
@@ -300,6 +318,7 @@ class App extends React.Component {
                     loadListCallback={this.loadList}
                     renameListCallback={this.renameList}
                     toggleEditCallback = {this.toggleEdit}
+                    addListEnabled = {!this.state.closeListEnabled}
                 />
                 <Workspace
                     currentList={this.state.currentList}

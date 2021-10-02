@@ -170,6 +170,14 @@ body {
   color:black;
 }
 
+button:disabled {
+  background-color:rgb(190, 165, 165);
+}
+
+input:disabled {
+  background-color:rgb(190, 165, 165);
+}
+
 .top5-button-disabled {
   opacity: 0.25; 
   cursor: not-allowed;

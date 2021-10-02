@@ -7,8 +7,12 @@ export default class Banner extends React.Component {
             <div id="top5-banner">
                 {this.props.title}
                 <EditToolbar
+                closeCallback = {this.props.closeCallback}
                 undoCallback = {this.props.undoCallback}
-                redoCallback = {this.props.redoCallback} />
+                redoCallback = {this.props.redoCallback}
+                undoEnabled = {this.props.undoEnabled}
+                redoEnabled = {this.props.redoEnabled}
+                closeListEnabled = {this.props.closeListEnabled}/>
             </div>
         );
     }
