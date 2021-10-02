@@ -31,6 +31,7 @@ export default class Sidebar extends React.Component {
                             deleteListCallback={deleteListCallback}
                             loadListCallback={loadListCallback}
                             renameListCallback={renameListCallback}
+                            toggleEditCallback = {this.props.toggleEditCallback}
                         />
                     ))
                 }

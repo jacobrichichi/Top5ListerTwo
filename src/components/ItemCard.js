@@ -6,6 +6,7 @@ export default class ItemCard extends React.Component {
         super(props);
         this.state = {
             editing: false,
+            oldText: this.props.name,
             text: this.props.name,
             index: this.props.index,
             draggedOver: false
@@ -20,6 +21,8 @@ export default class ItemCard extends React.Component {
     }
 
     handleToggleEdit = () => {
+        this.props.toggleEditCallback(!this.state.editing);
+        
         this.setState({
             editing: !this.state.editing
         });
@@ -36,13 +39,13 @@ export default class ItemCard extends React.Component {
     }
 
     handleBlur = () => {
-        let text = '';
+        let newText = '';
         if(!this.state.text)
-            text = this.props.text;
+            newText = this.props.text;
         else{
-            text = this.state.text;
+            newText = this.state.text;
         }
-        this.props.renameItemCallback(this.props.index, text)
+        this.props.renameItemCallback(this.props.index, this.props.text, newText)
         this.handleToggleEdit();
     }
 

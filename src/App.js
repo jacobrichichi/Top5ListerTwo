@@ -1,6 +1,9 @@
 import React from 'react';
 import './App.css';
 
+import jsTPS from "./common/jsTPS";
+import ChangeItem_Transaction from "./transactions/ChangeItem_Transaction.js";
+import MoveItem_Transaction from "./transactions/MoveItem_Transaction.js";
 // IMPORT DATA MANAGEMENT AND TRANSACTION STUFF
 import DBManager from './db/DBManager';
 
@@ -21,11 +24,14 @@ class App extends React.Component {
         // GET THE SESSION DATA FROM OUR DATA MANAGER
         let loadedSessionData = this.db.queryGetSessionData();
 
+        this.tps = new jsTPS();
+
         // SETUP THE INITIAL STATE
         this.state = {
             currentList : null,
             sessionData : loadedSessionData,
-            listKeyPairMarkedForDeletion : null
+            listKeyPairMarkedForDeletion : null,
+            editing: false
         }
     }
     sortKeyNamePairsByName = (keyNamePairs) => {
@@ -137,6 +143,12 @@ class App extends React.Component {
     }
 
 
+    addRenameItemTransaction = (index, oldName, newName) => {
+        let transaction = new ChangeItem_Transaction(this, index, oldName, newName);
+        this.tps.addTransaction(transaction);
+        
+    }
+
     renameItem = (index, newName) => {
         let newList = this.state.currentList;
 
@@ -151,7 +163,11 @@ class App extends React.Component {
             this.db.mutationUpdateList(list);
             this.db.mutationUpdateSessionData(this.state.sessionData);
         })
-        
+    }
+
+    addMoveItemsTransaction = (source, target) => {
+        let transaction = new MoveItem_Transaction(this, source, target);
+        this.tps.addTransaction(transaction);
     }
 
     moveListItems = (source, target) => {
@@ -235,12 +251,46 @@ class App extends React.Component {
         modal.classList.remove("is-visible");
     }
 
+    undo = () => {
+        if (this.tps.hasTransactionToUndo()) {
+            this.tps.undoTransaction();
+            //update toolbar buttons
+        }
+    }
+
+    redo = () => {
+        if (this.tps.hasTransactionToRedo()){
+            this.tps.doTransaction();
+            //update toolbar buttons
+        }
+    }
+
+    toggleEdit = (isEditing) => {
+        this.setState({
+            editing: isEditing
+        })
+    }
+
     render() {
+        document.addEventListener('keydown', (event) => {
+            if(!this.state.editing){
+                console.log('hi')
+                if (event.keyCode === 88) {
+                    this.undo();
+                }
+                else if(event.keyCode === 89){
+                    this.redo();
+                }
+            }
+        })
+
         return (
             <div id="app-root">
                 <Banner 
                     title='Top 5 Lister'
-                    closeCallback={this.closeCurrentList} />
+                    closeCallback={this.closeCurrentList}
+                    undoCallback = {this.undo}
+                    redoCallback = {this.redo} />
                 <Sidebar
                     heading='Your Lists'
                     currentList={this.state.currentList}
@@ -249,11 +299,13 @@ class App extends React.Component {
                     deleteListCallback={this.deleteList}
                     loadListCallback={this.loadList}
                     renameListCallback={this.renameList}
+                    toggleEditCallback = {this.toggleEdit}
                 />
                 <Workspace
                     currentList={this.state.currentList}
-                    renameItemCallback={this.renameItem}
-                    moveListItemsCallback = {this.moveListItems} />
+                    renameItemCallback={this.addRenameItemTransaction}
+                    moveListItemsCallback = {this.addMoveItemsTransaction}
+                    toggleEditCallback = {this.toggleEdit} />
                 <Statusbar 
                     currentList={this.state.currentList} />
                 <DeleteModal

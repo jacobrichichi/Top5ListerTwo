@@ -20,8 +20,6 @@ export default class Workspace extends React.Component {
     }
 
     dragEnded = () => {
-        console.log(this.state.sourceItemIndex)
-        console.log(this.state.targetItemIndex)
         if(this.state.targetItemIndex !== -1){
             this.props.moveListItemsCallback(this.state.sourceItemIndex, this.state.targetItemIndex);
         }
@@ -42,7 +40,8 @@ export default class Workspace extends React.Component {
                             renameItemCallback = {this.props.renameItemCallback}
                             sourceItemCallback = {this.setSourceItemIndex}
                             targetItemCallback = {this.setTargetItemIndex}
-                            dragEndedCallback = {this.dragEnded}></ItemCard>
+                            dragEndedCallback = {this.dragEnded}
+                            toggleEditCallback = {this.props.toggleEditCallback}></ItemCard>
                         </div>
                     )
                 )
