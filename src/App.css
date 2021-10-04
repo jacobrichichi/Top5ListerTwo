@@ -170,8 +170,13 @@ body {
   color:black;
 }
 
+.top5-button:disabled {
+  cursor: not-allowed;
+}
+
 button:disabled {
   background-color:rgb(190, 165, 165);
+  cursor: not-allowed;
 }
 
 input:disabled {
