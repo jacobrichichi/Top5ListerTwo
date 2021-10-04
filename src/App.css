@@ -171,11 +171,12 @@ body {
 }
 
 .top5-button:disabled {
+  opacity: 0.25; 
   cursor: not-allowed;
 }
 
 button:disabled {
-  background-color:rgb(190, 165, 165);
+  opacity: 0.25; 
   cursor: not-allowed;
 }
 
